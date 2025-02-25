@@ -255,7 +255,7 @@ kaleb bayc pfp: https://files.catbox.moe/dex7lj.PNG
     },
     {
       name: "RYAN",
-      imageUrl: "https://files.catbox.moe/ygc6oc.PNG",
+      imageUrl: "https://files.catbox.moe/ixqebw.PNG",
       alternateImageUrl: "https://files.catbox.moe/7qyxgx.jpg",
       position: { x: 65, y: 55 },
       mobilePosition: { x: 70, y: 60 },
@@ -264,7 +264,7 @@ kaleb bayc pfp: https://files.catbox.moe/dex7lj.PNG
     },
     {
       name: "KALEB",
-      imageUrl: "https://files.catbox.moe/vb4x7y.PNG",
+      imageUrl: "https://files.catbox.moe/dex7lj.PNG",
       alternateImageUrl: "https://files.catbox.moe/xq2f4d.png",
       position: { x: 35, y: 60 },
       mobilePosition: { x: 40, y: 90 },
