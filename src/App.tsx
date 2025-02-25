@@ -91,7 +91,7 @@ function MusicControls({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch(error => console.log("Playback failed:", error));
+        audioRef.current.play().catch(error => console.log("Playback failed!"));
       }
     }
   };
@@ -260,7 +260,7 @@ kaleb bayc pfp: https://files.catbox.moe/dex7lj.PNG
       position: { x: 65, y: 55 },
       mobilePosition: { x: 70, y: 60 },
       size: 160,
-      telegramUrl: "https://t.me/groupchannel"
+      telegramUrl: "https://t.me/baycboys"
     },
     {
       name: "KALEB",
@@ -378,7 +378,7 @@ kaleb bayc pfp: https://files.catbox.moe/dex7lj.PNG
       {/* Logos */}
       <div className="fixed top-8 left-8 z-50">
         <a 
-          href="https://t.me/groupchannel" 
+          href="https://t.me/baycboys" 
           target="_blank" 
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
