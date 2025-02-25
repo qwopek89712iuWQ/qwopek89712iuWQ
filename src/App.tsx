@@ -23,7 +23,7 @@ function MusicControls({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const initialLoadRef = useRef(true);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const songs: Song[] = [
     { title: "Jazz Track 1", url: "https://files.catbox.moe/itg2jk.mp3" },
@@ -31,27 +31,47 @@ function MusicControls({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     { title: "Jazz Track 3", url: "https://files.catbox.moe/gs7apl.mp3" }
   ];
 
+  const attemptPlay = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+    } catch (error) {
+      console.log("Playback attempt failed, retrying...", error);
+      // Retry after a short delay
+      retryTimeoutRef.current = setTimeout(attemptPlay, 1000);
+    }
+  };
+
   useEffect(() => {
     if (!audioRef.current) {
       const audio = new Audio(songs[currentSongIndex].url);
       audio.volume = volume;
       audioRef.current = audio;
+
+      // Set up event listeners
+      audio.addEventListener('ended', handleNextSong);
+      audio.addEventListener('pause', () => setIsPlaying(false));
+      audio.addEventListener('play', () => setIsPlaying(true));
     }
 
-    const handleSongEnd = () => {
-      handleNextSong();
-    };
-
-    audioRef.current.addEventListener('ended', handleSongEnd);
-    
-    if (initialLoadRef.current && isPlaying) {
-      audioRef.current.play().catch(error => console.log("Playback failed:", error));
-    }
-    initialLoadRef.current = false;
+    // Start attempting to play
+    attemptPlay();
 
     return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
       if (audioRef.current) {
-        audioRef.current.removeEventListener('ended', handleSongEnd);
+        audioRef.current.removeEventListener('ended', handleNextSong);
+        audioRef.current.removeEventListener('pause', () => setIsPlaying(false));
+        audioRef.current.removeEventListener('play', () => setIsPlaying(true));
+        audioRef.current.pause();
       }
     };
   }, []);
@@ -66,32 +86,25 @@ function MusicControls({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     if (audioRef.current) {
       audioRef.current.src = songs[currentSongIndex].url;
       if (isPlaying) {
-        audioRef.current.play().catch(error => console.log("Playback failed:", error));
+        attemptPlay();
       }
     }
   }, [currentSongIndex]);
 
   const handlePrevSong = () => {
-    setCurrentSongIndex((prev) => {
-      const newIndex = (prev - 1 + songs.length) % songs.length;
-      return newIndex;
-    });
+    setCurrentSongIndex((prev) => (prev - 1 + songs.length) % songs.length);
   };
 
   const handleNextSong = () => {
-    setCurrentSongIndex((prev) => {
-      const newIndex = (prev + 1) % songs.length;
-      return newIndex;
-    });
+    setCurrentSongIndex((prev) => (prev + 1) % songs.length);
   };
 
   const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch(error => console.log("Playback failed!"));
+        attemptPlay();
       }
     }
   };
